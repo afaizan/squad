@@ -5,14 +5,20 @@ filename = "../train-v1.1.json"
 jso = open(filename)
 d = json.load(jso)
 
-paragraph = []
+train = []
 
-for i in range(len(d['data'])):
-	for j in range(len(d['data'][i]['paragraphs'])):
-		paragraph.append(d['data'][i]['paragraphs'][j]['context'])
+data = d['data']
 
-print(len(paragraph))
+for topic in data:
+	train += [{'context': para['context'],
+				'id': qa['id'],
+				'ques': qa['question'],
+				'answer': qa['answers'][0]['text'],
+				'answer_start': qa['answers'][0]['answer_start'],
+				'answer_end': qa['answers'][0]['answer_start'] + len(qa['answers'][0]['text'])-1,
+				'topic': topic['title']}
+				for para in topic['paragraphs']
+				for qa in para['qas']]
 
-for i in range(10):
-	print(paragraph[i])
-	print("==========================================================================\n")
+with open('../train.json','w') as fd:
+	json.dump(train,fd)
